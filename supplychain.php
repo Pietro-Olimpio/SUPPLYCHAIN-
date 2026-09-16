@@ -103,6 +103,11 @@ $cotacoesAbertas = [
     ]
 
 ];
+//DESAFIO
+//persistência de dados
+// Se o arquivo JSON existir, carregar as cotações salvas 
+if (file_exists('cotacoes.json')) { $cotacoesSalvas = json_decode( file_get_contents('cotacoes.json'), true ); if (is_array($cotacoesSalvas)) { $cotacoesAbertas = array_merge( $cotacoesAbertas, $cotacoesSalvas);} 
+}
 
 
 // Constantes
@@ -257,15 +262,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['condicoes_pagamento'] ?? ''
 
     ];
-
-    // Validar dados
-
-    $erros = validarCotacao($dados);
-
-    // Se válido, adicionar à lista
-    // Se inválido, exibir erros
 }
 
+    // Validar dados
+    $erros = validarCotacao($dados);
+
+    // Se não houver erros 
+if (!empty($erros)) {$valor = str_replace( ['R$', '.', ','], ['', '', '.'], $dados['valor_cotacao'] );
+
+//nova cotação 
+$novaCotacao = [ 
+    'id' => count($cotacoesAbertas) + 1, 
+    'fornecedor' => $dados['nome_fornecedor'], 
+    'email' => $dados['email_fornecedor'], 
+    'categoria' => $dados['categoria_produto'], 
+    'descricao' => $dados['descricao_item'], 
+    'valor' => (float)$valor, 
+    'prazo' => (int)$dados['prazo_entrega_dias'], 
+    'condicao' => $dados['condicoes_pagamento'], 
+    'data_abertura' => date('Y-m-d') ];  //date: formata a data e a hr Y(ano) m(mes) d(dia)
+
+//nova cotação ao array 
+$cotacoesAbertas[] = $novaCotacao; 
+
+// Ao submeter um novo formulário válido:
+file_put_contents( 'cotacoes.json', json_encode( $cotacoesAbertas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ); //salva o array dentro do json
+
+// Ao carregar a página:
+if (file_exists('cotacoes.json')) {
+    $cotacoesAbertas = json_decode(file_get_contents('cotacoes.json'), true); //pega os daddos do jason e coloca no array
+}
+
+}
 
 ?>
 <!-- HTML aqui -->
