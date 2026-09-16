@@ -268,15 +268,181 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 ?>
-<!-- HTML aqui -->
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>supplychain</title>
+    <title>SupplyChain SENAI</title>
+
+```
+<style>
+    body {
+        font-family: Arial;
+        background: #f2f2f2;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #ec3fa4;
+    }
+
+    form {
+        background: white;
+        padding: 15px;
+        margin-bottom: 20
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0 10px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background: #ec3fa4;
+        color: white;
+        padding: 10px;
+        border: none;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background: #ec3fa4;
+        color: white;
+    }
+
+    .erro {
+        color: red;
+    }
+</style>
+```
+
 </head>
+
 <body>
-    
+
+<h1>SupplyChain SENAI</h1>
+
+<h2>Filtrar Cotações</h2>
+
+<form method="GET">
+
+```
+<label>Fornecedor:</label>
+<input type="text" name="fornecedor"
+    value="<?= htmlspecialchars($filtroFornecedor) ?>">
+
+<label>Valor máximo:</label>
+<input type="number" name="valor_max" step="0.01"
+    value="<?= htmlspecialchars($_GET['valor_max'] ?? '') ?>">
+
+<button>Filtrar</button>
+```
+
+</form>
+
+<h2>Cotações Abertas</h2>
+
+<table>
+
+```
+<tr>
+    <th>ID</th>
+    <th>Fornecedor</th>
+    <th>Categoria</th>
+    <th>Descrição</th>
+    <th>Valor</th>
+    <th>Prazo</th>
+    <th>Pagamento</th>
+    <th>Data</th>
+</tr>
+
+<?php foreach ($cotacoesFiltradas as $cotacao): ?>
+
+<tr>
+    <td><?= $cotacao['id'] ?></td>
+    <td><?= htmlspecialchars($cotacao['fornecedor']) ?></td>
+    <td><?= htmlspecialchars($cotacao['categoria']) ?></td>
+    <td><?= htmlspecialchars($cotacao['descricao']) ?></td>
+    <td>R$ <?= number_format($cotacao['valor'], 2, ',', '.') ?></td>
+    <td><?= $cotacao['prazo'] ?> dias</td>
+    <td><?= htmlspecialchars($cotacao['condicao']) ?></td>
+    <td><?= $cotacao['data_abertura'] ?></td>
+</tr>
+
+<?php endforeach; ?>
+```
+
+</table>
+
+<h2>Nova Cotação</h2>
+
+<form method="POST">
+
+```
+<label>Nome:</label>
+<input type="text" name="nome_fornecedor"
+    value="<?= htmlspecialchars($dados['nome_fornecedor'] ?? '') ?>">
+
+<label>E-mail:</label>
+<input type="text" name="email_fornecedor"
+    value="<?= htmlspecialchars($dados['email_fornecedor'] ?? '') ?>">
+
+<label>Categoria:</label>
+<select name="categoria_produto">
+    <option value="">Selecione</option>
+
+    <?php foreach (CATEGORIAS_PERMITIDAS as $categoria): ?>
+        <option value="<?= $categoria ?>"
+            <?= (($dados['categoria_produto'] ?? '') == $categoria) ? 'selected' : '' ?>>
+            <?= $categoria ?>
+        </option>
+    <?php endforeach; ?>
+
+</select>
+
+<label>Descrição:</label>
+<textarea name="descricao_item"><?= htmlspecialchars($dados['descricao_item'] ?? '') ?></textarea>
+
+<label>Valor:</label>
+<input type="text" name="valor_cotacao"
+    value="<?= htmlspecialchars($dados['valor_cotacao'] ?? '') ?>">
+
+<label>Prazo:</label>
+<input type="number" name="prazo_entrega_dias" min="1" max="60"
+    value="<?= htmlspecialchars($dados['prazo_entrega_dias'] ?? '') ?>">
+
+<label>Pagamento:</label>
+<select name="condicoes_pagamento">
+    <option value="">Selecione</option>
+
+    <?php foreach (CONDICOES_PAGAMENTO as $condicao): ?>
+        <option value="<?= $condicao ?>"
+            <?= (($dados['condicoes_pagamento'] ?? '') == $condicao) ? 'selected' : '' ?>>
+            <?= $condicao ?>
+        </option>
+    <?php endforeach; ?>
+
+</select>
+
+<button>Enviar Cotação</button>
+```
+
+</form>
+
 </body>
 </html>
